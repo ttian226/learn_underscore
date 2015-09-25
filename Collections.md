@@ -204,7 +204,230 @@ _.contains([1, 2, 3], 1);   //true
 _.contains([1, 2, 3], 1, 1);   //false
 ```
 
+#### invoke
 
+第二个参数是一个函数名
+返回这个函数调用数组中每个元素的结果组成的一个数组。
 
+```javascript
+var r = _.invoke([[5, 1, 7], [3, 2, 1]], 'sort');
 
+console.log(r); //[[1, 5, 7], [1, 2, 3]]
+```
 
+#### pluck
+
+第一个参数是js对象组成的数组，第二个参数是指定的属性名
+返回一个数组，数组中每个元素由指定的属性名所对应的值组成。
+
+```javascript
+var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
+var r = _.pluck(stooges, 'name');
+console.log(r); //["moe", "larry", "curly"]
+```
+
+#### max
+
+返回数组中的最大值
+
+```javascript
+var r = _.max([1, 2, 3], function (element) {
+    return element;
+});
+console.log(r); //3
+```
+
+或者是
+
+`_.max([1, 2, 3]);`
+
+数组的元素是对象
+
+```javascript
+var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
+var r = _.max(stooges, function (element) {
+    return element.age; //获取age值最大的那个元素
+});
+
+console.log(r); //{name: "curly", age: 60}
+```
+
+#### min
+
+返回数组中的最小值
+
+```javascript
+var numbers = [10, 5, 100, 2, 1000];
+_.min(numbers); //2
+```
+
+#### sortBy
+
+返回一个排序的新数组，第二个参数是一个回调
+
+```javascript
+var r = _.sortBy([1, 2, 3, 4, 5, 6], function (element) {
+    return Math.sin(element);   //根据Math.sin()的结果由小到大排序
+});
+
+console.log(r); //[5, 4, 6, 3, 1, 2]
+```
+
+第二个参数可以是字符串，它列表中元素的属性名
+
+```javascript
+var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}, {name: 'larry', age: 50}];
+var r = _.sortBy(stooges, 'age');   //按照属性age由小到大，返回一个新的数组
+console.log(r); //[{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}]
+```
+
+#### groupBy
+
+给列表中的元素分组，返回一个新的对象
+
+```javascript
+var r = _.groupBy([1.3, 2.1, 2.4], function (element) {
+    return Math.floor(element); //按照Math.floor的结果分组
+});
+
+console.log(r); //{1: [1.3], 2: [2.1, 2.4]}
+```
+
+如果第二个参数是字符串时，作为每个元素的属性来分组
+
+```javascript
+var r = _.groupBy(['one', 'tow', 'three'], 'length');   //按照length属性分组
+console.log(r); //{3: ["one", "two"], 5: ["three"]}
+```
+
+上面的分组也可以这么写：
+
+```javascript
+var r = _.groupBy(['one', 'tow', 'three'], function (element) {
+    return element.length;  //按照字符串的长度分组
+});
+console.log(r); //{3: ["one", "two"], 5: ["three"]}
+```
+
+#### indexBy
+
+返回一个对象，对象中的属性名由第二个参数决定，它可以是一个函数，返回指定的属性名
+
+```javascript
+var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}, {name: 'larry', age: 50}];
+var r = _.indexBy(stooges, function (element) {
+    return element.age; //age属性作为索引
+});
+console.log(r); 
+//{
+//"40": {name: 'moe', age: 40},
+//"50": {name: 'larry', age: 50},
+//"60": {name: 'curly', age: 60}
+//}
+```
+
+第二个参数可以是字符串，它是元素的一个属性名，上面的代码也可以这么写：
+
+```javascript
+var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}, {name: 'larry', age: 50}];
+var r = _.indexBy(stooges, 'age');  //根据age的值作为索引分组
+console.log(r); 
+//{
+//"40": {name: 'moe', age: 40},
+//"50": {name: 'larry', age: 50},
+//"60": {name: 'curly', age: 60}
+//}
+```
+
+#### countBy
+
+和`_.groupBy()`类似，给列表中的元素分组，返回一个新的对象，和`_.groupBy()`不同的是它的值不是数组而是在数组中值的个数。
+
+```javascript
+var r = _.countBy([1.3, 2.1, 2.4], function (element) {
+    return Math.floor(element);
+});
+
+console.log(r); //{1: 1, 2: 2}
+```
+
+```javascript
+var r = _.countBy([1, 2, 3, 4, 5], function (element) {
+    return element % 2 === 0 ? 'even' : 'odd';
+});
+
+console.log(r); //{odd: 3, even: 2}
+```
+
+第二个参数是个字符串
+
+```javascript
+var r = _.countBy(['one', 'tow', 'three'], 'length');
+console.log(r); //{3: 2, 5: 1}
+```
+
+#### shuffle
+
+返回一个打乱的新的数组
+
+```javascript
+var r = _.shuffle([1, 2, 3, 4, 5, 6]);
+console.log(r); //[4, 1, 6, 3, 5, 2]
+```
+
+#### sample
+
+随机返回数组的的一个值，或由几个值组成的一个数组。
+如果不指定第二个参数，随机返回一个值。
+
+```javascript
+var r = _.sample([1, 2, 3, 4, 5, 6]);   //随机返回一个值
+console.log(r); //4
+```
+
+如果指定了第二个参数，则返回一个数组
+
+```javascript
+var r = _.sample([1, 2, 3, 4, 5, 6], 1); //返回随机取1个值组成的数组
+console.log(r); //[4]
+```
+
+```javascript
+var r = _.sample([1, 2, 3, 4, 5, 6], 3); //返回随机取3个值组成的数组
+console.log(r); //[1, 3, 4]
+```
+
+#### toArray
+
+转化为真实的数组，通常用于把函数的argument对象转换为数组（通常把Array like对象转化为数组）
+
+```javascript
+function test() {
+    var args = _.toArray(arguments);    //把arguments对象转化为数组
+    var r = args.slice(1);
+    console.log(r);
+}
+
+test(1, 2, 3, 4);
+```
+
+#### size
+
+返回列表中元素的个数，列表可以是数组也可以是js对象
+
+```javascript
+_.size({one: 1, two: 2, three: 3});     //3
+_.size([1, 2, 3, 4, 5, 6]);     //6
+```
+
+#### partition
+
+把数组中的元素分成两个数组，一部分满足回调函数中的条件，一部分不满足回调中的条件
+
+```javascript
+var r = _.partition([0, 1, 2, 3, 4, 5], function (element) {
+    return element % 2 === 0;   //把值为true的元素归为第一个数组，值为false的元素归为第二个数组
+});
+
+console.log(r); //[[0, 2, 4], [1, 3, 5]]
+```

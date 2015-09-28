@@ -45,7 +45,7 @@ var buttonView = {
 };
 
 // 把onClick和onHover方法绑定到buttonView对象上。
-// 如果不使用这行代码，那么事件回调中的this指向的是Element对象，而不是buttonView
+// 如果不使用这行代码，那么事件回调中的this指向的是Element对象（Button按钮），而不是buttonView对象
 _.bindAll(buttonView, 'onClick', 'onHover');
 
 var btn = document.querySelectorAll('.btn');

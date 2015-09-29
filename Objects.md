@@ -200,9 +200,13 @@ _.has({a: 1, b: 2, c: 3}, "b"); //true
 
 #### property
 
+返回一个函数，这个函数返回传入对象的key的属性值
+
 ```javascript
 var stooge = {name: 'moe'};
+// property接受一个key作为参数，返回一个函数func
 var func = _.property('name');
+// 函数func接受一个对象作为参数，返回key的属性值
 func(stooge);   //'moe'
 ```
 

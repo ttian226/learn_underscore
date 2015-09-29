@@ -210,4 +210,198 @@ var func = _.property('name');
 func(stooge);   //'moe'
 ```
 
+#### propertyOf
 
+和`_.property()`相反，接受一个对象作为参数返回一个函数，这个函数可以根据指定的key返回value。
+
+```javascript
+var stooge = {name: 'moe'};
+// propertyOf接收一个对象作为参数，返回一个函数func
+var func = _.propertyOf(stooge);
+// 函数func接受一个key作为参数，返回key的属性值
+func('name');
+```
+
+#### matcher
+
+返回一个断言函数，这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性
+
+#### isEqual
+
+比较两个对象，检查它们是否应该被视为相等。
+
+```javascript
+var stooge = {name: 'moe', luckyNumbers: [13, 27, 34]};
+var clone = {name: 'moe', luckyNumbers: [13, 27, 34]};
+console.log(stooge === clone); //false
+_.isEqual(stooge, clone); //true
+```
+
+#### isMatch
+
+检测对象是否包含指定的properties
+
+```javascript
+var stooge = {name: 'moe', age: 32};
+_.isMatch(stooge, {age: 32}); //true
+```
+
+#### isEmpty
+
+检查对象是否为空，如果对于字符串或ArrayLike对象检查length属性是否为0
+
+```javascript
+_.isEmpty({});  //true
+_.isEmpty([]);  //true
+_.isEmpty('');  //true
+_.isEmpty([1, 2, 3]); //false
+_.isEmpty('test'); //false
+```
+
+#### isElement
+
+检查对象是否是一个Dom Element对象
+
+```javascript
+var body = document.querySelector('body');
+_.isElement(body);  //true
+```
+
+#### isArray
+
+检查对象是否是一个数组，ArrayLike对象返回false
+
+```javascript
+_.isArray([1, 2, 3]); //true
+_.isArray({0: 1, 1: 2, 2: 3, length: 3}); //false
+
+function test() {
+    console.log(_.isArray(arguments)); //false
+}
+test(1, 2, 3);
+```
+
+#### isObject
+
+检查给定的值是否是一个对象，js数组和function被视为对象，字符串和数字不是对象
+
+```javascript
+_.isObject({}); //true
+_.isObject([1, 2, 3]); //true
+_.isObject(alert); //true
+_.isObject('a'); //false
+_.isObject(1); //false
+```
+
+#### isArguments
+
+检查对象是否是`Arguments`对象
+
+```javascript
+function test() {
+    console.log(_.isArguments(arguments)); //true
+}
+test(1, 2, 3);
+```
+
+#### isFunction
+
+检查对象是否是`Function`
+
+```javascript
+_.isFunction(alert); //true
+```
+
+#### isString
+
+检查对象是否是字符串
+
+```javascript
+_.isString("moe"); //true
+```
+
+#### isNumber
+
+检查对象是否是`Number`（包括NaN）
+
+```javascript
+_.isNumber(100); //true
+_.isNumber(NaN); //true
+```
+
+#### isFinite
+
+检查对象是否是有限的`Number`
+
+```javascript
+_.isFinite(Infinity);   //false
+_.isFinite(NaN);   //false
+_.isFinite(100);   //true
+```
+
+#### isBoolean
+
+检查对象是否是布尔类型
+
+```javascript
+_.isBoolean(true);  //true
+_.isBoolean(false); //true
+_.isBoolean(null);  //false
+```
+
+#### isDate
+
+检查对象是否是`Date`类型
+
+```javascript
+_.isDate(new Date());   //true
+```
+
+#### isRegExp
+
+检查对象是否是正则表达式
+
+```javascript
+_.isRegExp(/moe/); //true
+```
+
+#### isError
+
+检查对象是否是一个`Error`对象
+
+```javascript
+try {
+    throw new TypeError("Example");
+} catch (o) {
+    _.isError(o); //true
+}
+```
+
+#### isNaN
+
+检查对象是否是一个`NaN`，和原生的`isNaN()`方法不同，原生的isNaN如果参数为`undefined`也返回true
+
+```javascript
+_.isNaN(NaN);   //true
+isNaN(undefined);   //true
+_.isNaN(undefined); //false
+```
+
+#### isNull
+
+检查对象是否为`null`
+
+```javascript
+_.isNull(null); //true
+_.isNull(undefined); //false
+```
+
+#### isUndefined
+
+检查对象是否为`undefined`
+
+```javascript
+var a;
+_.isUndefined(a);   //true
+_.isUndefined(undefined); //true
+```

@@ -115,7 +115,129 @@ var fibonacci = _.memoize(function(n) {
 fibonacci(10);  //55
 ```
 
+#### delay
 
+类似`setTimeout()`，在指定的毫秒后调用方法。第三个参数为要传递给被调用函数的参数
 
+```javascript
+var show = function (str) {
+    console.log(str);
+};
+_.delay(show, 1000, 'hello');
+```
 
+#### defer
+
+延迟调用function直到当前调用栈清空为止，类似使用延时为0的`setTimeout`方法。对于执行开销大的计算和无阻塞UI线程的HTML渲染时候非常有用。
+
+```javascript
+_.defer(function () {
+    alert('deferred');
+});
+```
+
+#### once
+
+创建一个只能被调用一次的函数。作为初始化函数使用时非常有用, 不用再设一个boolean值来检查是否已经初始化完成.
+
+```javascript
+var createApplication = function () {
+    alert('once');
+};
+
+var initialize = _.once(createApplication);
+initialize();
+initialize();
+```
+
+#### after
+
+创建一个函数, 只有在运行了`count`次之后才有效果. 在处理同组异步请求返回结果时, 如果你要确保同组里所有异步请求完成之后才执行这个函数, 这将非常有用
+
+```javascript
+var list = [1, 2, 3];
+var save = function () {
+    console.log('save');
+};
+// aftersave在被第三次调用时才调用save
+var aftersave = _.after(list.length, save);
+_.each(list, function (val) {
+    aftersave();
+});
+```
+
+#### before
+
+创建一个函数，调用不超过count次（从count次开始返回的结果是count-1次的值）
+
+```javascript
+var i = 1;
+
+var add = function () {
+    return i++;
+};
+
+var before = _.before(3, add);
+var r1 = before();
+console.log(r1);    //1
+var r2 = before();
+console.log(r2);    //2
+// 从第3次调用开始，返回的都是第二次的结果
+var r3 = before();
+console.log(r3);    //2
+var r4 = before();
+console.log(r4);    //2
+```
+
+#### wrap
+
+`_.wrap(function, wrapper)`
+
+将第一个函数`function`封装到函数`wrapper`里面, 并把函数`function`作为第一个参数传给`wrapper`. 这样可以让`wrapper`在`function` 运行之前和之后执行代码
+
+```javascript
+// hello是要被封装的函数
+var hello = function (name) {
+    return 'hello: ' + name;
+};
+
+// 第二个参数是一个wrapper，它的参数是一个函数的引用，也就是第一个参数hello
+var wrap = _.wrap(hello, function (func) {
+    return "before, " + func("moe") + ", after";
+});
+
+wrap(); //"before, hello: moe, after"
+```
+
+#### negate
+
+返回一个新的`predicate`函数的否定版本
+
+```javascript
+var isEven = function (val) {
+    return val % 2 === 0;
+};
+var isOdd = _.negate(isEven);
+
+var r1 = _.filter([1, 2, 3, 4, 5, 6], isEven);
+var r2 = _.filter([1, 2, 3, 4, 5, 6], isOdd);
+console.log(r1);    //[2, 4, 6]
+console.log(r2);    //[1, 3, 5]
+```
+
+#### compose
+
+返回函数集`functions`组合后的复合函数, 也就是一个函数执行完之后把返回的结果再作为参数赋给下一个函数来执行.
+
+```javascript
+var greet = function (name) {
+    return "hi: " + name;
+};
+var exclaim = function (statement) {
+    return statement.toUpperCase() + "!";
+};
+
+var welcome = _.compose(greet, exclaim);
+welcome('wang');    //'hi: WANG!'
+```
 

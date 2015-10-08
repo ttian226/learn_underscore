@@ -114,9 +114,26 @@
         }
 
         return function (obj, iteratee, memo, context) {
+            iteratee = optimizeCb(iteratee, context, 4);
+            var keys = !isArrayLike(obj) && _.keys(obj),
+                length = (keys || obj).length,
+                index = dir > 0 ? 0 : length - 1;//正向：index=0；逆向：index=集合长度-1
 
+            // 不传第三个参数memo
+            if (arguments.length < 3) {
+                // 数组，memo取数组索引为index的值
+                // 对象，memo取key对应的值
+                memo = obj[keys ? keys[index] : index];
+                index += dir;
+            }
+
+            return iterator(obj, iteratee, memo, keys, index, length);
         };
     }
+
+    _.reduce = createReduce(1);
+
+    _.reduceRight = createReduce(-1);
 
     // Object Functions
 

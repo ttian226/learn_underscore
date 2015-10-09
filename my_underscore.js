@@ -207,6 +207,10 @@
         return false;
     };
 
+    _.contains = _.includes = _.include = function (obj, item, fromIndex, guard) {
+
+    };
+
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法
@@ -228,6 +232,52 @@
     _.findIndex = createPredicateIndexFinder(1);
     _.findLastIndex = createPredicateIndexFinder(-1);
 
+    // 返回一个索引，指示这个值应该被插入在数值的哪个位置
+    _.sortedIndex = function (array, obj, iteratee, context) {
+        iteratee = cb(iteratee, context, 1);
+        var value = iteratee(obj);
+        var low = 0, high = getLength(array);
+        while (low < high) {
+            var mid = Math.floor((low + high) / 2);
+            if (iteratee(array[mid]) < value) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    };
+
+    // 用来创建indexOf和lastIndexOf方法
+    function createIndexFinder(dir, predicateFind, sortedIndex) {
+        return function (array, item, idx) {
+            var i = 0, length = getLength(array);
+            if (typeof idx === 'number') {
+                if (dir > 0) {
+                    i = idx > 0 ? idx : Math.max(idx + length, i);
+                } else {
+                    length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
+                }
+            } else if (sortedIndex && idx && length) {
+            }
+
+            if (item !== item) {
+            }
+
+            for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
+                if (array[idx] === item) {
+                    return idx;
+                }
+            }
+            return -1;
+        };
+    }
+
+    // 返回元素在数组中的第一个索引位置，找不到元素返回-1
+    _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
+    _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
+
+
     // Function (ahem) Functions
 
     // 返回函数的否定版本
@@ -244,11 +294,9 @@
         if (!_.isObject(obj)) {
             return [];
         }
-
         if (nativeKeys) {
             return nativeKeys(obj);
         }
-
         var keys = [];
         for (var key in obj) {
             if (_.has(obj, key)) {
@@ -256,6 +304,17 @@
             }
         }
         return keys;
+    };
+
+    // 返回对象所有属性值组成的数组
+    _.values = function (obj) {
+        var keys = _.keys(obj);
+        var length = keys.length;
+        var values = Array(length);
+        for (var i = 0; i < length; i++) {
+            values[i] = obj[keys[i]];
+        }
+        return values;
     };
 
     // 返回对象的第一个满足条件（断言表达式中返回为true）的值的key

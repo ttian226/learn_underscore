@@ -109,8 +109,14 @@
     // 创建一个reduce方法，从左或从右迭代
     function createReduce(dir) {
 
+        // 迭代器
         function iterator(obj, iteratee, memo, keys, index, length) {
-
+            for (; index >= 0 && index < length; index += dir) {
+                var currentKey = keys ? keys[index] : index;
+                // 把上一次的结果保存到memo中，再通过参数传过去
+                memo = iteratee(memo, obj[currentKey], currentKey, obj);
+            }
+            return memo;
         }
 
         return function (obj, iteratee, memo, context) {

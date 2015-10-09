@@ -137,9 +137,36 @@
         };
     }
 
-    _.reduce = createReduce(1);
+    // 返回集合中所有值的一个单一结果
+    _.reduce = _.foldl = _.inject = createReduce(1);
 
-    _.reduceRight = createReduce(-1);
+    // reduce从右开始迭代的版本
+    _.reduceRight = _.foldr = createReduce(-1);
+
+    _.find = _.detect = function () {
+
+    };
+
+    // Array Functions
+
+    // 用来创建findIndex和findLastIndex的方法
+    function createPredicateIndexFinder(dir) {
+        return function (array, predicate, context) {
+            predicate = cb(predicate, context);
+            var length = getLength(array);
+            var index = dir > 0 ? 0 : length - 1;
+            for (; index >= 0 && index < length; index += dir) {
+                // 如果断言表达式返回true，返回当前值的索引
+                if (predicate(array[index], index, array)) {
+                    return index;
+                }
+            }
+        };
+    }
+
+    // 返回数组的第一个满足条件（断言表达式中返回为true）的值的索引
+    _.findIndex = createPredicateIndexFinder(1);
+    _.findLastIndex = createPredicateIndexFinder(-1);
 
     // Object Functions
 
@@ -160,6 +187,19 @@
             }
         }
         return keys;
+    };
+
+    // 返回对象的第一个满足条件（断言表达式中返回为true）的值的key
+    _.findKey = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = _.keys(obj), key;
+        for (var i = 0, length = keys.length; i < length; i++) {
+            key = keys[i];
+            // 如果断言表达式返回true，返回当前值的key
+            if (predicate(obj[key], key, obj)) {
+                return key;
+            }
+        }
     };
 
     // 检查给定的值是否是对象

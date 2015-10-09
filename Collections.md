@@ -91,6 +91,16 @@ var r = _.find([1, 2, 3, 4, 5, 6], function (element) {
 console.log(r); //2
 ```
 
+如果是对象，返回value
+
+```javascript
+var r = _.find({one: 1, two: 2, three: 3}, function (val, key) {
+    return key === 'two';
+});
+
+console.log(r); //2
+```
+
 #### filter
 
 遍历数组，返回一个新的数组，新数组中每个值在回调中都返回true

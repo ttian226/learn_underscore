@@ -55,6 +55,9 @@
 
     // 在内部经常使用的一个函数，产生一个回调函数用来迭代集合中每一个元素
     var cb = function (value, context, argCount) {
+        if (value == null) {
+            return _.identity;
+        }
         if (_.isFunction(value)) {
             return optimizeCb(value, context, argCount);
         }
@@ -143,8 +146,65 @@
     // reduce从右开始迭代的版本
     _.reduceRight = _.foldr = createReduce(-1);
 
-    _.find = _.detect = function () {
+    // 返回集合中的元素在断言表达式返回true的第一个值
+    _.find = _.detect = function (obj, predicate, context) {
+        var key;
+        if (isArrayLike(obj)) {
+            // 数组，返回索引
+            key = _.findIndex(obj, predicate, context);
+        } else {
+            // 对象，返回key
+            key = _.findKey(obj, predicate, context);
+        }
+        if (key !== void 0 && key !== -1) {
+            // 数组返回索引对应的value，对象返回key对应的value
+            return obj[key];
+        }
+    };
 
+    // 返回断言表达式中为true的所有值组成的数组
+    _.filter = _.select = function (obj, predicate, context) {
+        var results = [];
+        predicate = cb(predicate, context);
+        _.each(obj, function (value, index, list) {
+            if (predicate(value, index, list)) {
+                results.push(value);
+            }
+        });
+        return results;
+    };
+
+    // 返回断言表达式中为false的所有值组成的数组
+    _.reject = function (obj, predicate, context) {
+        return _.filter(obj, _.negate(cb(predicate)), context);
+    };
+
+    // 检测是否所有元素都通过断言为true的测试
+    _.every = _.all = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = !isArrayLike(obj) && _.keys(obj),
+            length = (keys || obj).length;
+        for (var index = 0; index < length; index++) {
+            var currentKey = keys ? keys[index] : index;
+            if (!predicate(obj[currentKey], currentKey, obj)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // 检测至少有一个元素通过断言为true的测试
+    _.some = _.any = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = !isArrayLike(obj) && _.keys(obj),
+            length = (keys || obj).length;
+        for (var index = 0; index < length; index++) {
+            var currentKey = keys ? keys[index] : index;
+            if (predicate(obj[currentKey], currentKey, obj)) {
+                return true;
+            }
+        }
+        return false;
     };
 
     // Array Functions
@@ -167,6 +227,15 @@
     // 返回数组的第一个满足条件（断言表达式中返回为true）的值的索引
     _.findIndex = createPredicateIndexFinder(1);
     _.findLastIndex = createPredicateIndexFinder(-1);
+
+    // Function (ahem) Functions
+
+    // 返回函数的否定版本
+    _.negate = function (predicate) {
+        return function () {
+            return !predicate.apply(this, arguments);
+        };
+    };
 
     // Object Functions
 
@@ -216,6 +285,13 @@
     // 检查对象是否有指定的给定的直接属性
     _.has = function (obj, key) {
         return obj != null && hasOwnProperty.call(obj, key);
+    };
+
+    // Utility Functions
+
+    // 返回一个与传入相等的值
+    _.identity = function (value) {
+        return value;
     };
 
 }.call(this));

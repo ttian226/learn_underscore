@@ -316,6 +316,21 @@
         }
         return result;
     };
+
+    // 打乱数组中的元素
+    _.shuffle = function (obj) {
+        var set = isArrayLike(obj) ? obj : _.values(obj);
+        var length = set.length;
+        var shuffled = Array(length);
+        for (var index = 0, rand; index < length; index++) {
+            rand = _.random(0, index);
+            if (rand !== index) {
+                shuffled[index] = shuffled[rand];
+            }
+            shuffled[rand] = set[index];
+        }
+        return shuffled;
+    };
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法
@@ -501,6 +516,16 @@
         return function (obj) {
             return _.isMatch(obj, attrs);//内部调用isMatch方法
         };
+    };
+
+    // 返回介于最大值和最小值之间的一个整数
+    _.random = function (min, max) {
+        // 只传一个数作为最大值，取0到这个数之间的随机数
+        if (max == null) {
+            max = min;
+            min = 0;
+        }
+        return min + Math.floor(Math.random() * (max - min + 1));
     };
 
 }.call(this));

@@ -111,7 +111,6 @@
 
     // 创建一个reduce方法，从左或从右迭代
     function createReduce(dir) {
-
         // 迭代器
         function iterator(obj, iteratee, memo, keys, index, length) {
             for (; index >= 0 && index < length; index += dir) {
@@ -207,10 +206,31 @@
         return false;
     };
 
+    // 检查数值或对象中是否包含指定的值
     _.contains = _.includes = _.include = function (obj, item, fromIndex, guard) {
-
+        if (!isArrayLike(obj)) {
+            obj = _.values(obj);
+        }
+        if (typeof fromIndex !== 'number' || guard) {
+            fromIndex = 0;
+        }
+        return _.indexOf(obj, item, fromIndex) >= 0;
     };
 
+    // 对集合中的每个元素调用指定的方法
+    _.invoke = function (obj, method) {
+        var args = slice.call(arguments, 2);//获取method参数
+        var isFunc = _.isFunction(method);
+        return _.map(obj, function (value) {
+            var func = isFunc ? method : value[method];
+            return func == null ? func : func.apply(value, args);
+        });
+    };
+
+    // 通过map来集合中的获取指定的属性值
+    _.pluck = function (obj, key) {
+        return _.map(obj, _.property(key));
+    };
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法
@@ -254,7 +274,7 @@
             var i = 0, length = getLength(array);
             if (typeof idx === 'number') {
                 if (dir > 0) {
-                    i = idx > 0 ? idx : Math.max(idx + length, i);
+                    i = idx >= 0 ? idx : Math.max(idx + length, i);
                 } else {
                     length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
                 }
@@ -330,6 +350,22 @@
         }
     };
 
+    // 检查对象是否含有指定的键值对
+    _.isMatch = function (object, attrs) {
+        var keys = _.keys(attrs), length = keys.length;
+        if (object == null) {
+            return !length;
+        }
+        var obj = Object(object);
+        for (var i = 0; i < length; i++) {
+            var key = keys[i];
+            if (attrs[key] !== obj[key] || !(key in obj)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     // 检查给定的值是否是对象
     _.isObject = function (obj) {
         var type = typeof obj;
@@ -351,6 +387,12 @@
     // 返回一个与传入相等的值
     _.identity = function (value) {
         return value;
+    };
+
+    _.property = property;
+
+    _.matcher = _.matches = function (attr) {
+
     };
 
 }.call(this));

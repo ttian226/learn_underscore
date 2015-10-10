@@ -225,6 +225,24 @@ var r = _.invoke([[5, 1, 7], [3, 2, 1]], 'sort');
 console.log(r); //[[1, 5, 7], [1, 2, 3]]
 ```
 
+例：
+
+```javascript
+// 创建一个类W
+function W(val) {
+    this.val = val;
+}
+
+// 原型方法doubleVal
+W.prototype.doubleVal = function () {
+    return this.val * 2;
+};
+
+// 数组中每个值是作为方法的context传入的，如W.prototype.doubleVal.apply(new W(2))
+var r = _.invoke([new W(2), new W(3), new W(4)], W.prototype.doubleVal);
+console.log(r); //[4, 6, 8]
+```
+
 #### pluck
 
 第一个参数是js对象组成的数组，第二个参数是指定的属性名

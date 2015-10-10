@@ -63,6 +63,31 @@
         }
     };
 
+    // 赋值函数
+    var createAssigner = function (keysFunc, undefinedOnly) {
+        // obj是要被赋值的对象，从第二个参数开始为js对象
+        return function (obj) {
+            var length = arguments.length;
+            if (length < 2 || obj == null) {
+                return obj;
+            }
+            // 从第二个参数遍历，每个参数是一个js对象
+            for (var index = 1; index < length; index++) {
+                var source = arguments[index],  //js对象
+                    keys = keysFunc(source),
+                    l = keys.length;
+                // 遍历keys
+                for (var i = 0; i < l; i++) {
+                    var key = keys[i];
+                    if (!undefinedOnly || obj[key] === void 0) {
+                        obj[key] = source[key]; //给obj赋值
+                    }
+                }
+            }
+            return obj;//返回赋值后的对象
+        };
+    };
+
     var property = function (key) {
         return function (obj) {
             return obj == null ? void 0 : obj[key];
@@ -326,6 +351,18 @@
         return keys;
     };
 
+    // 返回对象的所有属性名
+    _.allKeys = function (obj) {
+        if (!_.isObject(obj)) {
+            return [];
+        }
+        var keys = [];
+        for (var key in obj) {
+            keys.push(key);
+        }
+        return keys;
+    };
+
     // 返回对象所有属性值组成的数组
     _.values = function (obj) {
         var keys = _.keys(obj);
@@ -336,6 +373,12 @@
         }
         return values;
     };
+
+    // 给一个对象扩展指定对象上的所有属性
+    _.extend = createAssigner(_.allKeys);
+
+    // 给一个对象扩展指定对象上的自有属性
+    _.extendOwn = _.assign = createAssigner(_.keys);
 
     // 返回对象的第一个满足条件（断言表达式中返回为true）的值的key
     _.findKey = function (obj, predicate, context) {

@@ -256,6 +256,11 @@
     _.pluck = function (obj, key) {
         return _.map(obj, _.property(key));
     };
+
+    // 返回包含有指定键值对的对象组成的数组，内部调用filter方法，本质上就是一个过滤函数
+    _.where = function (obj, attrs) {
+        return _.filter(obj, _.matcher(attrs));
+    };
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法
@@ -434,8 +439,13 @@
 
     _.property = property;
 
-    _.matcher = _.matches = function (attr) {
-
+    // 返回一个断言函数，检查给定的对象中是否包含指定的键值对(attrs)
+    _.matcher = _.matches = function (attrs) {
+        attrs = _.extendOwn({}, attrs);
+        // 参数obj是要检查的js对象
+        return function (obj) {
+            return _.isMatch(obj, attrs);//内部调用isMatch方法
+        };
     };
 
 }.call(this));

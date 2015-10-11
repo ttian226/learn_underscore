@@ -331,6 +331,23 @@
         }
         return shuffled;
     };
+
+    // 随机选取集合中的几个值
+    _.sample = function (obj, n, guard) {
+        // 只传一个参数，随机返回一个元素
+        if (n == null || guard) {
+            if (!isArrayLike(obj)) {
+                obj = _.values(obj);
+            }
+            return obj[_.random(obj.length - 1)]
+        }
+        // 指定个数，返回一个集合
+        return _.shuffle(obj).slice(0, Math.max(0, n));
+    };
+
+    _.sortBy = function (obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+    };
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法

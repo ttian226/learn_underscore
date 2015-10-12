@@ -435,7 +435,51 @@
         }
         return isArrayLike(obj) ? obj.length : _.keys(obj).length;
     };
+
+    // 把集合分割成两个数组，一部分满足断言，一部分不满足断言
+    _.partition = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var pass = [], fail = [];
+        _.each(obj, function (value, key, obj) {
+            (predicate(value, key, obj) ? pass : fail).push(value);
+        });
+        return [pass, fail];
+    };
+
     // Array Functions
+
+    // 返回数组的第一个元素或前面几个元素组成的数组
+    _.first = _.head = _.take = function (array, n, guard) {
+        if (array == null) {
+            return void 0;
+        }
+        if (n == null || guard) {
+            return array[0];
+        }
+        return _.initial(array, array.length - n);
+    };
+
+    // 返回数组中除了最后指定个数以外的所有元素组成的数组
+    _.initial = function (array, n, guard) {
+        var max = array.length - (n == null || guard ? 1 : n);
+        return slice.call(array, 0, Math.max(0, max));
+    };
+
+    // 返回数组的最后一个元素或最后面几个元素组成的数组
+    _.last = function (array, n, guard) {
+        if (array == null) {
+            return void 0;
+        }
+        if (n == null || guard) {
+            return array[array.length - 1];
+        }
+        return _.rest(array, Math.max(0, array.length - n));
+    };
+
+    // 返回数组中除了最前面指定个数以外的所有元素组成的数组
+    _.rest = _.tail = _.drop = function (array, n, guard) {
+        return slice.call(array, n == null ? 1 : n);
+    };
 
     // 用来创建findIndex和findLastIndex的方法
     function createPredicateIndexFinder(dir) {

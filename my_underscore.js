@@ -345,8 +345,32 @@
         return _.shuffle(obj).slice(0, Math.max(0, n));
     };
 
+    // 根据iteratee方法的返回值来排序集合中的值
     _.sortBy = function (obj, iteratee, context) {
         iteratee = cb(iteratee, context);
+        var func = function (value, index, list) {
+            return {
+                value: value,
+                index: index,
+                criteria: iteratee(value, index, list)
+            };
+        };
+        // sort()的排序函数
+        var compare = function (left, right) {
+            var a = left.criteria;
+            var b = right.criteria;
+            // a,b不同时
+            if (a !== b) {
+                if (a > b || a === void 0) return 1;
+                if (b > a || b === void 0) return -1;
+            }
+            // a,b相同是比较索引
+            return left.index - right.index;
+        };
+        // _.map(obj, func)返回一个数组，数组中每个元素分别有value,index,criteria三个属性
+        // 这个数组调用排序sort()方法，返回一个按照元素中criteria属性结果排序后的数组
+        // 调用pluck提取每个元素的value属性返回一个新的数组
+        return _.pluck(_.map(obj, func).sort(compare), 'value');
     };
     // Array Functions
 

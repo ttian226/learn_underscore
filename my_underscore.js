@@ -481,6 +481,56 @@
         return slice.call(array, n == null ? 1 : n);
     };
 
+    // 从数组中去除所有的false值
+    _.compact = function (array) {
+        return _.filter(array, _.identity);
+    };
+
+    // flatten使用的内部函数
+    var flatten = function (input, shallow, strict, startIndex) {
+        var output = [], idx = 0;
+        for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
+            var value = input[i];
+            if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+                if (!shallow) {
+                    value = flatten(value, shallow, strict);
+                }
+                var j = 0, len = value.length;
+                output.length += len;
+                while (j < len) {
+                    output[idx++] = value[j++];
+                }
+            } else {
+                output[idx++] = value;
+            }
+        }
+        return output;
+    };
+
+    // 把多层嵌套的数值转化为单层数组
+    _.flatten = function (array, shallow) {
+        return flatten(array, shallow, false);
+    };
+
+    // 返回不包括指定元素的数组
+    _.without = function (array) {
+        return _.difference(array, slice.call(arguments, 1))
+    };
+
+    _.uniq = _.unique = function (array, isSorted, iteratee, context) {
+
+    };
+
+    // 返回只在第一个数组中存在的元素组成的数组
+    _.difference = function (array) {
+        // rest为获取传入的第二个数组
+        var rest = flatten(arguments, true, true, 1);
+        // 遍历第一个数组array的每个值
+        return _.filter(array, function (value) {
+            return !_.contains(rest, value);
+        });
+    };
+
     // 用来创建findIndex和findLastIndex的方法
     function createPredicateIndexFinder(dir) {
         return function (array, predicate, context) {
@@ -643,9 +693,28 @@
         return type === 'function' || type === 'object' && !!obj;
     };
 
+    // 添加isType方法：isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError
+    _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function (name) {
+        _['is' + name] = function (obj) {
+            return toString.call(obj) === '[object ' + name + ']'
+        };
+    });
+
+    // IE < 9
+    if (!_.isArguments(arguments)) {
+        _.isArguments = function (obj) {
+            return _.has(obj, 'callee');
+        };
+    }
+
     // 检查对象是否是函数类型
     _.isFunction = function (obj) {
         return typeof obj == 'function' || false;
+    };
+
+    // 检查是否是布尔值
+    _.isBoolean = function (obj) {
+        return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
     };
 
     // 检查对象是否有指定的给定的直接属性

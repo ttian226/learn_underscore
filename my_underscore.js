@@ -61,6 +61,11 @@
         if (_.isFunction(value)) {
             return optimizeCb(value, context, argCount);
         }
+        if (_.isObject(value)) {
+
+        }
+        // 既不是函数又不是对象返回_.property方法
+        return _.property(value);
     };
 
     // 赋值函数
@@ -372,6 +377,64 @@
         // 调用pluck提取每个元素的value属性返回一个新的数组
         return _.pluck(_.map(obj, func).sort(compare), 'value');
     };
+
+    // 用于处理group by操作的内部方法
+    var group = function (behavior) {
+        return function (obj, iteratee, context) {
+            var result = {};
+            iteratee = cb(iteratee, context);
+            _.each(obj, function (value, index) {
+                var key = iteratee(value, index, obj);
+                behavior(result, value, key);
+            });
+            return result;
+        };
+    };
+
+    // 分组集合
+    _.groupBy = group(function (result, value, key) {
+        if (_.has(result, key)) {
+            result[key].push(value);
+        } else {
+            result[key] = [value];
+        }
+    });
+
+    // 按照指定的key分组集合，key需要是唯一的
+    _.indexBy = group(function (result, value, key) {
+        result[key] = value;
+    });
+
+    // 按照数量分组集合
+    _.countBy = group(function (result, value, key) {
+        if (_.has(result, key)) {
+            result[key]++;
+        } else {
+            result[key] = 1;
+        }
+    });
+
+    // 把对象转换为数组
+    _.toArray = function (obj) {
+        if (!obj) {
+            return [];
+        }
+        if (_.isArray(obj)) {
+            return slice.call(obj);
+        }
+        if (isArrayLike(obj)) {
+            return _.map(obj, _.identity);
+        }
+        return _.values(obj);
+    };
+
+    // 返回集合中元素的个数
+    _.size = function (obj) {
+        if (obj == null) {
+            return 0;
+        }
+        return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+    };
     // Array Functions
 
     // 用来创建findIndex和findLastIndex的方法
@@ -523,6 +586,11 @@
             }
         }
         return true;
+    };
+
+    // 检查对象是否是数组
+    _.isArray = nativeIsArray || function(obj) {
+        return toString.call(obj) === '[object Array]';
     };
 
     // 检查给定的值是否是对象

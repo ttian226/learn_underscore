@@ -518,7 +518,34 @@
     };
 
     _.uniq = _.unique = function (array, isSorted, iteratee, context) {
+        // 参数是array,iteratee,context的情况
+        if (!_.isBoolean(isSorted)) {
+            context = iteratee;
+            iteratee = isSorted;
+            isSorted = false;
+        }
+        if (iteratee != null) {
+            iteratee = cb(iteratee, context);
+        }
+        var result = [];
+        var seen = [];
+        for (var i = 0, length = getLength(array); i < length; i++) {
+            var value = array[i],
+                computed = iteratee ? iteratee(value, i, array) : value;
+            if (isSorted) {
+                // 传两个参数的情况array, isSorted
+                if (!i || seen !== computed) {
+                    result.push(value);
+                }
+                seen = computed;
+            } else if (iteratee) {
 
+            } else if (!_.contains(result, value)) {
+                // 只传一个参数array的情况
+                result.push(value);
+            }
+        }
+        return result;
     };
 
     // 返回只在第一个数组中存在的元素组成的数组

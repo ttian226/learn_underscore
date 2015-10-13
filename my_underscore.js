@@ -663,9 +663,15 @@
                     length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
                 }
             } else if (sortedIndex && idx && length) {
+                // 对于排序数组，第三个参数可以传true
+                idx = sortedIndex(array, item);
+                return array[idx] === item ? idx : -1;
             }
 
+            // item = NaN
             if (item !== item) {
+                idx = predicateFind(slice.call(array, i, length), _.isNaN);
+                return idx >= 0 ? idx + i : -1;
             }
 
             for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
@@ -681,6 +687,20 @@
     _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
     _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
 
+    // 根据start,stop,step创建一个整型元素的数组
+    _.range = function (start, stop, step) {
+        if (stop == null) {
+            stop = start || 0;
+            start = 0;
+        }
+        step = step || 1;
+        var length = Math.max(Math.ceil((stop - start) / step), 0);
+        var range = Array(length);
+        for (var idx = 0; idx < length; idx++, start += step) {
+            range[idx] = start;
+        }
+        return range;
+    };
 
     // Function (ahem) Functions
 
@@ -796,6 +816,11 @@
     // 检查对象是否是函数类型
     _.isFunction = function (obj) {
         return typeof obj == 'function' || false;
+    };
+
+    // 是否是NaN
+    _.isNaN = function (obj) {
+        return _.isNumber(obj) && obj !== +obj;
     };
 
     // 检查是否是布尔值

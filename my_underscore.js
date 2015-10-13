@@ -84,6 +84,8 @@
                 // 遍历keys
                 for (var i = 0; i < l; i++) {
                     var key = keys[i];
+                    // 如果不传参数undefinedOnly，则会覆盖已经存在的属性
+                    // 如果undefinedOnly=true，如果已经存在则不会覆盖原有属性
                     if (!undefinedOnly || obj[key] === void 0) {
                         obj[key] = source[key]; //给obj赋值
                     }
@@ -753,6 +755,53 @@
         return values;
     };
 
+    // 映射对象
+    _.mapObject = function (obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+        var keys = _.keys(obj),
+            length = keys.length,
+            results = {},
+            currentKey;
+
+        for (var index = 0; index < length; index++) {
+            currentKey = keys[index];
+            results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+        }
+        return results;
+    };
+
+    // 把对象转换为[key, value]列表
+    _.pairs = function (obj) {
+        var keys = _.keys(obj);
+        var length = keys.length;
+        var pairs = Array(length);
+        for (var i = 0; i < length; i++) {
+            pairs[i] = [keys[i], obj[keys[i]]];
+        }
+        return pairs;
+    };
+
+    // 对象的键值互相对调
+    _.invert = function (obj) {
+        var keys = _.keys(obj);
+        var result = {};
+        for (var i = 0, length = keys.length; i < length; i++) {
+            result[obj[keys[i]]] = keys[i];
+        }
+        return result;
+    };
+
+    // 返回对象里的所有方法名
+    _.functions = _.methods = function (obj) {
+        var names = [];
+        for (var key in obj) {
+            if (_.isFunction(obj[key])) {
+                names.push(key);
+            }
+        }
+        return names.sort();
+    };
+
     // 给一个对象扩展指定对象上的所有属性
     _.extend = createAssigner(_.allKeys);
 
@@ -771,6 +820,52 @@
             }
         }
     };
+
+    // 返回一个对象的拷贝，只包括白名单属性
+    _.pick = function (object, oiteratee, context) {
+        var result = {},
+            obj = object,
+            iteratee, keys;
+        if (obj == null) {
+            return result;
+        }
+        if (_.isFunction(oiteratee)) {
+            // 第二个参数为函数
+            keys = _.allKeys(obj);
+            iteratee = optimizeCb(oiteratee, context);
+        } else {
+            // 从第二个参数开始是要筛选的属性
+            keys = flatten(arguments, false, false, 1);
+            iteratee = function (value, key, obj) {
+                return key in obj;
+            };
+            obj = Object(obj);
+        }
+        for (var i = 0, length = keys.length; i < length; i++) {
+            var key = keys[i];
+            var value = obj[key];
+            if (iteratee(value, key, obj)) {
+                result[key] = value;
+            }
+        }
+        return result;
+    };
+
+    // 返回一个对象的拷贝，不包括黑名单属性
+    _.omit = function (obj, iteratee, context) {
+        if (_.isFunction(iteratee)) {
+            iteratee = _.negate(iteratee);
+        } else {
+            var keys = _.map(flatten(arguments, false, false, 1), String);
+            iteratee = function (value, key) {
+                return !_.contains(keys, key);
+            };
+        }
+        return _.pick(obj, iteratee, context);
+    };
+
+    // 和extend方法的唯一不同就是它不会覆盖已有属性
+    _.defaults = createAssigner(_.allKeys, true);
 
     // 检查对象是否含有指定的键值对
     _.isMatch = function (object, attrs) {

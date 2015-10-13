@@ -517,6 +517,7 @@
         return _.difference(array, slice.call(arguments, 1))
     };
 
+    // 返回一个数组，数组中的元素是唯一的。
     _.uniq = _.unique = function (array, isSorted, iteratee, context) {
         // 参数是array,iteratee,context的情况
         if (!_.isBoolean(isSorted)) {
@@ -539,7 +540,11 @@
                 }
                 seen = computed;
             } else if (iteratee) {
-
+                // 参数array, iteratee, context
+                if (!_.contains(seen, computed)) {
+                    seen.push(computed);
+                    result.push(value);
+                }
             } else if (!_.contains(result, value)) {
                 // 只传一个参数array的情况
                 result.push(value);

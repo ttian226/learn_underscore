@@ -70,6 +70,36 @@ _.invert({Moe: "Moses", Larry: "Louis", Curly: "Jerome"});
 
 创建具有给定原型的新对象
 
+```javascript
+function Shape() {
+    this.x = 0;
+    this.y = 0;
+}
+Shape.prototype.move = function(x, y) {
+    this.x += x;
+    this.y += y;
+    console.info('Shape moved.');
+};
+function Rectangle() {
+    Shape.call(this);
+}
+// 用Shape的原型对象初始化Rectangle的原型对象
+Rectangle.prototype = _.create(Shape.prototype);
+Rectangle.prototype.constructor = Rectangle;
+var r = new Rectangle();
+r.move(10, 20);
+```
+
+传入第二个参数，给原型对象添加额外属性
+
+```javascript
+var props = {z: 100};
+Rectangle.prototype = _.create(Shape.prototype, props);
+Rectangle.prototype.constructor = Rectangle;
+var r = new Rectangle();
+console.log(r.z);   //100
+```
+
 #### functions
 
 返回对象里的所有方法名

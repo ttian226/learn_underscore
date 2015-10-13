@@ -95,6 +95,20 @@
         };
     };
 
+    // 创建一个继承其它原型的一个实例
+    var baseCreate = function (prototype) {
+        if (!_.isObject(prototype)) {
+            return {};
+        }
+        if (nativeCreate) {
+            return nativeCreate(prototype);
+        }
+        Ctor.prototype = prototype;
+        var result = new Ctor();
+        Ctor.prototype = null;
+        return result;
+    };
+
     var property = function (key) {
         return function (obj) {
             return obj == null ? void 0 : obj[key];
@@ -866,6 +880,15 @@
 
     // 和extend方法的唯一不同就是它不会覆盖已有属性
     _.defaults = createAssigner(_.allKeys, true);
+
+    // 创建具有给定原型的新对象
+    _.create = function (prototype, props) {
+        var result = baseCreate(prototype);
+        if (props) {
+            _.extendOwn(result, props);
+        }
+        return result;
+    };
 
     // 检查对象是否含有指定的键值对
     _.isMatch = function (object, attrs) {

@@ -553,6 +553,32 @@
         return result;
     };
 
+    // 把一个或多个数组合并成一个数组，数组中去除相同的元素
+    _.union = function () {
+        return _.uniq(flatten(arguments, true, true));
+    };
+
+    // 返回多个数组中都存在的值组成的数值
+    _.intersection = function (array) {
+        var result = [];
+        var argsLength = arguments.length;
+        for (var i = 0, length = getLength(array); i < length; i++) {
+            var item = array[i];
+            if (_.contains(result, item)) {
+                continue;
+            }
+            for (var j = 1; j < argsLength; j++) {
+                if (!_.contains(arguments[j], item)) {
+                    break;
+                }
+            }
+            if (j === argsLength) {
+                result.push(item);
+            }
+        }
+        return result;
+    };
+
     // 返回只在第一个数组中存在的元素组成的数组
     _.difference = function (array) {
         // rest为获取传入的第二个数组
@@ -561,6 +587,34 @@
         return _.filter(array, function (value) {
             return !_.contains(rest, value);
         });
+    };
+
+    // 合并数组，把不同数组中相同位置的元素合并到一个数组中（参数是多个数组）
+    _.zip = function () {
+        return _.unzip(arguments);
+    };
+
+    // _.zip的逆向操作（参数是一个二维数组）
+    _.unzip = function (array) {
+        var length = array && _.max(array, getLength).length || 0;
+        var result = Array(length);
+        for (var index = 0; index < length; index++) {
+            result[index] = _.pluck(array, index);
+        }
+        return result;
+    };
+
+    // 把多个数组转化为js对象
+    _.object = function (list, values) {
+        var result = {};
+        for (var i = 0, length = getLength(list); i < length; i++) {
+            if (values) {
+                result[list[i]] = values[i];
+            } else {
+                result[list[i][0]] = list[i][1];
+            }
+        }
+        return result;
     };
 
     // 用来创建findIndex和findLastIndex的方法

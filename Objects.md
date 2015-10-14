@@ -220,6 +220,17 @@ _.clone({name: 'moe'}); //{name: 'moe'}
 
 用 object作为参数来调用函数interceptor，然后返回object
 
+```javascript
+var o = {one: 1, two: 2, three: 3};
+var double = function (obj) {
+    _.each(obj, function (value, key) {
+        obj[key] = value * 2;
+    });
+};
+var r = _.tap(o, double);
+console.log(r);
+```
+
 #### has
 
 检查对象是否包含指定的key，等同于`object.hasOwnProperty(key)`

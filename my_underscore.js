@@ -890,6 +890,20 @@
         return result;
     };
 
+    // 创建一个对象的浅拷贝
+    _.clone = function (obj) {
+        if (!_.isObject(obj)) {
+            return obj;
+        }
+        return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+    };
+
+    // 对obj对象调用函数interceptor，并返回这个对象
+    _.tap = function (obj, interceptor) {
+        interceptor(obj);
+        return obj;
+    };
+
     // 检查对象是否含有指定的键值对
     _.isMatch = function (object, attrs) {
         var keys = _.keys(attrs), length = keys.length;

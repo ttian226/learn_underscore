@@ -920,6 +920,47 @@
         return true;
     };
 
+    // 提供给isEqual调用的内部函数
+    var eq = function (a, b) {
+        if (a === b) {
+            return a !== 0 || 1 / a === 1 / b;
+        }
+        // null == undefined，但null !== undefined
+        if (a == null || b == null) {
+            return a === b;
+        }
+        if (a instanceof _) {
+            a = a._wrapped;
+        }
+        if (b instanceof _) {
+            b = b._wrapped;
+        }
+        // a,b类型不同返回false
+        var className = toString.call(a);
+        if (className !== toString.call(b)) {
+            return false;
+        }
+        switch (className) {
+            case '[object RegExp]':
+            case '[object String]':
+                return '' + a === '' + b;
+            case '[object Number]':
+                // a为NaN时，如果b不为NaN返回false，b为NaN返回true
+                if (+a !== +a) {
+                    return +b !== +b;
+                }
+                return +a === 0 ? 1 / +a === 1 / b : +a === +b;
+            case '[object Date]':
+            case '[object Boolean]':
+                return +a === +b;
+        }
+    };
+
+    // 执行深比较检查两个对象是否相等
+    _.isEqual = function (a, b) {
+        return eq(a, b);
+    };
+
     // 检查对象是否是数组
     _.isArray = nativeIsArray || function(obj) {
         return toString.call(obj) === '[object Array]';

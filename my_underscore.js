@@ -1016,6 +1016,22 @@
         return eq(a, b);
     };
 
+    // 检查给定的数组，字符串，对象是否为空
+    _.isEmpty = function (obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) {
+            return obj.length === 0;
+        }
+        return _.keys(obj).length === 0;
+    };
+
+    // 检查对象是否是Dom元素
+    _.isElement = function (obj) {
+        return !!(obj && obj.nodeType === 1);
+    };
+
     // 检查对象是否是数组
     _.isArray = nativeIsArray || function(obj) {
         return toString.call(obj) === '[object Array]';
@@ -1046,6 +1062,11 @@
         return typeof obj == 'function' || false;
     };
 
+    // 检查对象是否是finite
+    _.isFinite = function (obj) {
+        return isFinite(obj) && !isNaN(parseFloat(obj));
+    };
+
     // 是否是NaN
     _.isNaN = function (obj) {
         return _.isNumber(obj) && obj !== +obj;
@@ -1054,6 +1075,16 @@
     // 检查是否是布尔值
     _.isBoolean = function (obj) {
         return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+    };
+
+    // 检查对象是否是null
+    _.isNull = function (obj) {
+        return obj === null;
+    };
+
+    // 检查对象是否是undefined
+    _.isUndefined = function (obj) {
+        return obj === void 0;
     };
 
     // 检查对象是否有指定的给定的直接属性

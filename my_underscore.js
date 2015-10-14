@@ -921,7 +921,7 @@
     };
 
     // 提供给isEqual调用的内部函数
-    var eq = function (a, b) {
+    var eq = function (a, b, aStack, bStack) {
         if (a === b) {
             return a !== 0 || 1 / a === 1 / b;
         }
@@ -954,6 +954,61 @@
             case '[object Boolean]':
                 return +a === +b;
         }
+        var areArrays = className === '[object Array]';
+        if (!areArrays) {
+            if (typeof a !== 'object' || typeof b !== 'object') {
+                return false;
+            }
+            var aCtor = a.constructor, bCtor = b.constructor;
+            if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+                _.isFunction(bCtor) && bCtor instanceof bCtor)
+                && ('constructor' in a && 'constructor' in b)) {
+                return false;
+            }
+        }
+        aStack = aStack || [];
+        bStack = bStack || [];
+        var length = aStack.length;
+        while (length--) {
+            if (aStack[length] === a) {
+                return bStack[length] === b;
+            }
+        }
+        aStack.push(a);
+        bStack.push(b);
+
+        if (areArrays) {
+            // 数组
+            length = a.length;
+            if (length !== b.length) {
+                return false;
+            }
+            // 遍历数组每个元素
+            while (length--) {
+                // 递归比较
+                if (!eq(a[length], b[length], aStack, bStack)) {
+                    return false;
+                }
+            }
+        } else {
+            // 对象
+            var keys = _.keys(a), key;
+            length = keys.length;
+            if (_.keys(b).length !== length) {
+                return false;
+            }
+            // 遍历对象每个属性
+            while (length--) {
+                key = keys[length];
+                // 递归比较属性的每个属性的值是否相等
+                if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) {
+                    return false;
+                }
+            }
+        }
+        aStack.pop();
+        bStack.pop();
+        return true;
     };
 
     // 执行深比较检查两个对象是否相等

@@ -782,10 +782,58 @@
         return obj;
     };
 
+    // 缓存开销高的函数结果
+    _.memoize = function (func, hasher) {
+        var memoize = function (key) {
+            var cache = memoize.cache;
+            var address = '' + (hasher ? hasher.apply(this, arguments) : key);
+            if (!_.has(cache, address)) {
+                cache[address] = func.apply(this, arguments);
+            }
+            return cache[address];
+        };
+        memoize.cache = {};
+        return memoize;
+    };
+
+    // 延迟执行函数
+    _.delay = function (func, wait) {
+        var args = slice.call(arguments, 2);
+        return setTimeout(function () {
+            return func.apply(null, args);
+        }, wait);
+    };
+
+    // 延迟调用函数直到当前调用栈清空为止
+    _.defer = _.partial(_.delay, _, 1);
+
     // 返回函数的否定版本
     _.negate = function (predicate) {
         return function () {
             return !predicate.apply(this, arguments);
+        };
+    };
+
+    // 返回一个函数在被调用第N次时执行
+    _.after = function (times, func) {
+        return function () {
+            if (--times < 1) {
+                return func.apply(this, arguments);
+            }
+        };
+    };
+
+    // 返回一个函数只能被执行N-1次
+    _.before = function (times, func) {
+        var memo;
+        return function () {
+            if (--times > 0) {
+                memo = func.apply(this, arguments);
+            }
+            if (times <= 1) {
+                func = null;
+            }
+            return memo;
         };
     };
 

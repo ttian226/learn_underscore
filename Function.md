@@ -18,6 +18,18 @@ f2();   //'hi:xu'
 func('hello'); //'hello:a'
 ```
 
+如果是用`_.bind()`返回的函数作为构造函数，则原函数内部的上下文不是传入的对象了
+
+```javascript
+var name = 't';
+var F = function() {
+    console.log(this.name);
+};
+var boundf = _.bind(F, {name: 'moe curly'});
+var Boundf = boundf;
+var newBoundf = new Boundf();   //这里是undefined，而不是'moe curly'
+```
+
 #### bindAll
 
 把一些方法绑定到指定的对象上，这些方法就会在这个对象的上下文中执行。经常用作事件处理函数的场景。

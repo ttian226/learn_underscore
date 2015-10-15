@@ -719,6 +719,37 @@
     };
 
     // Function (ahem) Functions
+    // 决定是否作为一个构造函数被调用，或者是作为一个普通函数调用
+    var executeBound = function (sourceFunc, boundFunc, context, callingContext, args) {
+        // 作为普通函数
+        if (!(callingContext instanceof boundFunc)) {
+            return sourceFunc.apply(context, args);
+        }
+        // 作为构造函数
+        var self = baseCreate(sourceFunc.prototype);
+        var result = sourceFunc.apply(self, args);
+        if (!_.isObject(result)) {
+            return result;
+        }
+        return self;
+    };
+
+    // 创建了一个被绑定了指定对象的函数
+    _.bind = function (func, context) {
+        if (nativeBind && func.bind === nativeBind) {
+            return nativeBind.apply(func, slice.call(arguments, 1));
+        }
+        if (!_.isFunction(func)) {
+            throw new TypeError('Bind must be called on a function');
+        }
+        // 获取func的参数
+        var args = slice.call(arguments, 2);
+        var bound = function () {
+            // 如果_.bind返回的函数作为构造函数时，this是bound的实例(this instanceof bound === true)
+            return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
+        };
+        return bound;
+    };
 
     // 返回函数的否定版本
     _.negate = function (predicate) {

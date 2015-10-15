@@ -58,6 +58,7 @@ var buttonView = {
 
 // 把onClick和onHover方法绑定到buttonView对象上。
 // 如果不使用这行代码，那么事件回调中的this指向的是Element对象（Button按钮），而不是buttonView对象
+// bindAll后，buttonView发生改变，即buttonView.onClick和buttonView.onHover的函数中上下文为buttonView对象，而不是Element元素，参考源码
 _.bindAll(buttonView, 'onClick', 'onHover');
 
 var btn = document.querySelectorAll('.btn');
@@ -65,6 +66,18 @@ var btn = document.querySelectorAll('.btn');
 for (var i = 0; i < btn.length; i++) {
     btn[i].addEventListener('click', buttonView.onClick, false);
     btn[i].addEventListener('mouseover', buttonView.onHover, false);
+}
+```
+
+以上代码如果使用`_.bind()`
+
+```javascript
+var click = _.bind(buttonView.onClick, buttonView);
+var hover = _.bind(buttonView.onHover, buttonView);
+var btn = document.querySelectorAll('.btn');
+for (var i = 0; i < btn.length; i++) {
+    btn[i].addEventListener('click', click, false);
+    btn[i].addEventListener('mouseover', hover, false);
 }
 ```
 

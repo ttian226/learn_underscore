@@ -751,6 +751,37 @@
         return bound;
     };
 
+    // 填充部分参数返回一个函数
+    _.partial = function (func) {
+        var boundArgs = slice.call(arguments, 1);
+        var bound = function () {
+            var position = 0, length = boundArgs.length;
+            var args = Array(length);
+            for (var i = 0; i < length; i++) {
+                args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
+            }
+            while (position < arguments.length) {
+                args.push(arguments[position++]);
+            }
+            return executeBound(func, bound, this, this, args);
+        };
+        return bound;
+    };
+
+    // 把一些方法绑定到指定的对象上
+    _.bindAll = function (obj) {
+        var i, length = arguments.length, key;
+        if (length <= 1) {
+            throw new Error('bindAll must be passed function names');
+        }
+        for (var i = 1; i < length; i++) {
+            key = arguments[i];
+            // 改变之前的obj
+            obj[key] = _.bind(obj[key], obj);
+        }
+        return obj;
+    };
+
     // 返回函数的否定版本
     _.negate = function (predicate) {
         return function () {

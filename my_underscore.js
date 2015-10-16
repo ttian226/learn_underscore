@@ -1228,12 +1228,34 @@
 
     // Utility Functions
 
+    // 返回underscore对象，释放出`_`变量。
+    _.noConflict = function () {
+        root._ = previousUnderscore;
+        return this;
+    };
+
     // 返回一个与传入相等的值
     _.identity = function (value) {
         return value;
     };
 
+    // 创建一个函数，返回相同的值
+    _.constant = function (value) {
+        return function () {
+            return value;
+        };
+    };
+
+    _.noop = function () {};
+
     _.property = property;
+
+    // 返回对象的指定属性值
+    _.propertyOf = function (obj) {
+        return obj == null ? function () {} : function (key) {
+            return obj[key];
+        }
+    };
 
     // 返回一个断言函数，检查给定的对象中是否包含指定的键值对(attrs)
     _.matcher = _.matches = function (attrs) {
@@ -1244,6 +1266,16 @@
         };
     };
 
+    // 执行指定函数n次
+    _.times = function (n, iteratee, context) {
+        var accum = Array(Math.max(0, n));
+        iteratee = optimizeCb(iteratee, context, 1);
+        for (var i = 0; i < n; i++) {
+            accum[i] = iteratee(i);
+        }
+        return accum;
+    };
+
     // 返回介于最大值和最小值之间的一个整数
     _.random = function (min, max) {
         // 只传一个数作为最大值，取0到这个数之间的随机数
@@ -1252,6 +1284,11 @@
             min = 0;
         }
         return min + Math.floor(Math.random() * (max - min + 1));
+    };
+
+    // 返回一个当前时间的一个整型的时间戳
+    _.now = Date.now || function() {
+        return new Date().getTime();
     };
 
 }.call(this));

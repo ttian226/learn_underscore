@@ -69,6 +69,17 @@ _.times(3, func);
 //2
 ```
 
+例2
+
+```javascript
+var func = function (n) {
+    return n;
+};
+
+var list = _.times(3, func);
+console.log(list);  //[0, 1, 2]
+```
+
 #### random
 
 返回一个指定范围的随机整数，如果只传一个参数最小值从0开始。

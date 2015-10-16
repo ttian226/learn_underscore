@@ -234,6 +234,21 @@ var wrap = _.wrap(hello, function (func) {
 wrap(); //"before, hello: moe, after"
 ```
 
+例2
+
+```javascript
+var hello = function (name) {
+    return 'hello: ' + name;
+};
+
+var call = function (func, v) {
+    return "before, " + func("moe") + ", after " + v;
+};
+var wrap = _.wrap(hello, call);
+
+wrap('aa'); //"before, hello: moe, after aa"
+```
+
 #### negate
 
 返回一个新的`predicate`函数的否定版本
@@ -264,5 +279,14 @@ var exclaim = function (statement) {
 
 var welcome = _.compose(greet, exclaim);
 welcome('wang');    //'hi: WANG!'
+```
+
+实际调用顺序（参考源码）
+
+```javascript
+// 先调用最后一个函数
+var result = exclaim('wang');
+// 再把返回值作为参数调用第一个函数
+greet(result);
 ```
 

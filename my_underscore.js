@@ -807,10 +807,31 @@
     // 延迟调用函数直到当前调用栈清空为止
     _.defer = _.partial(_.delay, _, 1);
 
+    _.wrap = function (func, wrapper) {
+        return _.partial(wrapper, func);
+    };
+
     // 返回函数的否定版本
     _.negate = function (predicate) {
         return function () {
             return !predicate.apply(this, arguments);
+        };
+    };
+
+    // 返回一个组合了多个函数的复合函数
+    _.compose = function () {
+        var args = arguments;
+        // 最后一个参数的索引
+        var start = args.length - 1;
+        return function () {
+            // 先调用最后一个函数，返回值为result
+            var i = start;
+            var result = args[start].apply(this, arguments);
+            // 每次把返回值result传递给前一个函数调用
+            while (i--) {
+                result = args[i].call(this, result);
+            }
+            return result;
         };
     };
 
@@ -836,6 +857,9 @@
             return memo;
         };
     };
+
+    // 返回一个函数只能被执行一次（无论被调用多少次），通常用来初始化
+    _.once = _.partial(_.before, 2);
 
     // Object Functions
 

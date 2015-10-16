@@ -1291,4 +1291,34 @@
         return new Date().getTime();
     };
 
+    // 要转义的字符列表
+    var escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;'
+    };
+
+    var unescapeMap = _.invert(escapeMap);
+
+    // 转义方法
+    var createEscaper = function (map) {
+        var escaper = function (match) {
+            return map[match];
+        };
+
+        var source = '(?:' + _.keys(map).join('|') + ')';
+        var testRegexp = RegExp(source);
+        var replaceRegexp = RegExp(source, 'g');
+        return function (string) {
+            string = string == null ? '' : '' + string;
+            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+        };
+    };
+
+    _.escape = createEscaper(escapeMap);
+    _.unescape = createEscaper(unescapeMap);
+
 }.call(this));

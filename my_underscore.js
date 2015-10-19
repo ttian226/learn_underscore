@@ -1321,4 +1321,112 @@
     _.escape = createEscaper(escapeMap);
     _.unescape = createEscaper(unescapeMap);
 
+    // 如果property是函数则调用它，否则返回这个属性值。如果属性不存在，返回fallback
+    _.result = function (object, property, fallback) {
+        var value = object == null ? void 0 : object[property];
+        if (value === void 0) {
+            value = fallback;
+        }
+        return _.isFunction(value) ? value.call(object) : value;
+    };
+
+    // 产生全局唯一的id
+    var idCounter = 0;
+    _.uniqueId = function (prefix) {
+        var id = ++idCounter + '';
+        return prefix ? prefix + id : id;
+    };
+
+    _.templateSettings = {
+        evaluate    : /<%([\s\S]+?)%>/g,
+        interpolate : /<%=([\s\S]+?)%>/g,
+        escape      : /<%-([\s\S]+?)%>/g
+    };
+
+    var noMatch = /(.)^/;
+
+    // 对指定的字符做转义处理，比如'\n'会被替换为'\\n'
+    var escapes = {
+        "'":      "'",
+        '\\':     '\\',
+        '\r':     'r',
+        '\n':     'n',
+        '\u2028': 'u2028',
+        '\u2029': 'u2029'
+    };
+
+    var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+    var escapeChar = function(match) {
+        return '\\' + escapes[match];
+    };
+
+    // 模板方法
+    _.template = function (text, settings, oldSettings) {
+        if (!settings && oldSettings) {
+
+        }
+        settings = _.defaults({}, settings, _.templateSettings);
+
+        // 拼装正则表达式
+        var matarr = [
+            (settings.escape || noMatch).source,
+            (settings.interpolate || noMatch).source,
+            (settings.evaluate || noMatch).source
+        ];
+        // 正则表达式：/<%-([\s\S]+?)%>|<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g
+        var matcher = RegExp(matarr.join('|') + '|$', 'g');
+
+        var index = 0;
+        var source = "__p+='";
+
+        // 遍历每个匹配的字符串，拼装source
+        text.replace(matcher, function (match, escape, interpolate, evaluate, offset) {
+            source += text.slice(index, offset).replace(escaper, escapeChar);
+            index = offset + match.length;
+            if (escape) {
+                // 匹配<%- %>使用_.escape进行转义
+                source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+            } else if (interpolate) {
+                // 匹配<%= %>，按原样输出
+                source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+            } else if (evaluate) {
+                // 匹配<% %>，支持模板中使用js
+                source += "';\n" + evaluate + "\n__p+='";
+            }
+            return match;
+        });
+
+        // 继续拼装source
+        source += "';\n";
+
+        if (!settings.variable) {
+            source = 'with(obj||{}){\n' + source + '}\n';
+        }
+
+        source = "var __t,__p='',__j=Array.prototype.join," +
+            "print=function(){__p+=__j.call(arguments,'');};\n" +
+            source + 'return __p;\n';
+
+        try {
+            // 使用Function构造函数创建函数render，接受两个参数
+            var render = new Function(settings.variable || 'obj', '_', source);
+        } catch (e) {
+            e.source = source;
+            throw  e;
+        }
+
+        // 定义要返回的模板函数
+        var template = function (data) {
+            // 传递两个参数data,和_
+            return render.call(this, data, _);
+        };
+
+        // 定义source属性
+        var argument = settings.variable || 'obj';
+        template.source = 'function(' + argument + '){\n' + source + '}';
+
+        return template;
+    };
+
 }.call(this));

@@ -1364,7 +1364,7 @@
     // 模板方法
     _.template = function (text, settings, oldSettings) {
         if (!settings && oldSettings) {
-
+            settings = oldSettings;
         }
         settings = _.defaults({}, settings, _.templateSettings);
 
@@ -1427,6 +1427,27 @@
         template.source = 'function(' + argument + '){\n' + source + '}';
 
         return template;
+    };
+
+    _.chain = function (obj) {
+        var instance = _(obj);
+        instance._chain = true;
+        return instance;
+    };
+
+    // OOP
+    _.mixin = function (obj) {
+        _.each(_.functions(obj), function (name) {
+            // 给`_`添加属性
+            var func = _[name] = obj[name];
+            // 给`_`的原型对象添加属性（定义实例方法）
+            _.prototype[name] = function () {
+                var args = [this._wrapped];
+                // 合并参数
+                push.apply(args, arguments);
+                return func.apply(_, args);
+            };
+        });
     };
 
 }.call(this));

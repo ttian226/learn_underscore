@@ -39,7 +39,10 @@
 
     // 如果浏览器下添加`_`作为全局对象
     if (typeof exports !== 'undefined') {
-
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = _;
+        }
+        exports._ = _;
     } else {
         root._ = _;
     }
@@ -51,6 +54,23 @@
         if (context === void 0) {
             return func;
         }
+        switch (argCount == null ? 3 : argCount) {
+            case 1: return function(value) {
+                return func.call(context, value);
+            };
+            case 2: return function(value, other) {
+                return func.call(context, value, other);
+            };
+            case 3: return function(value, index, collection) {
+                return func.call(context, value, index, collection);
+            };
+            case 4: return function(accumulator, value, index, collection) {
+                return func.call(context, accumulator, value, index, collection);
+            };
+        }
+        return function() {
+            return func.apply(context, arguments);
+        };
     };
 
     // 在内部经常使用的一个函数，产生一个回调函数用来迭代集合中每一个元素
@@ -62,7 +82,7 @@
             return optimizeCb(value, context, argCount);
         }
         if (_.isObject(value)) {
-
+            return _.matcher(value);
         }
         // 既不是函数又不是对象返回_.property方法
         return _.property(value);
@@ -1479,5 +1499,22 @@
             return result(this, method.apply(this._wrapped, arguments));
         };
     });
+
+    // 原型方法，获取underscore对象的值
+    _.prototype.value = function () {
+        return this._wrapped;
+    };
+
+    _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+
+    _.prototype.toString = function () {
+        return '' + this._wrapped;
+    };
+
+    if (typeof define === 'function' && define.amd) {
+        define('underscore', [], function() {
+            return _;
+        });
+    }
 
 }.call(this));

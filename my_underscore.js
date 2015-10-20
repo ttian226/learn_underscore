@@ -1436,6 +1436,10 @@
     };
 
     // OOP
+    var result = function(instance, obj) {
+        return instance._chain ? _(obj).chain() : obj;
+    };
+
     _.mixin = function (obj) {
         _.each(_.functions(obj), function (name) {
             // 给`_`添加属性
@@ -1445,9 +1449,35 @@
                 var args = [this._wrapped];
                 // 合并参数
                 push.apply(args, arguments);
-                return func.apply(_, args);
+                return result(this, func.apply(_, args));
             };
         });
     };
+
+    // 添加所有的underscore方法到外层对象上（给_()实例添加所有的方法）
+    _.mixin(_);
+
+    // 添加部分原生数组方法到外层对象上
+    _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (name) {
+        var method = ArrayProto[name];
+        _.prototype[name] = function () {
+            var obj = this._wrapped;
+            method.apply(obj, arguments);
+            if ((name === 'shift' || name === 'splice') && obj.length === 0) {
+                delete obj[0];
+            }
+            // 返回变化后的obj
+            return result(this, obj);
+        };
+    });
+
+    // 添加部分原生数组方法到外层对象上
+    _.each(['concat', 'join', 'slice'], function (name) {
+        var method = ArrayProto[name];
+        _.prototype[name] = function () {
+            // 返回原生方法返回的结果
+            return result(this, method.apply(this._wrapped, arguments));
+        };
+    });
 
 }.call(this));
